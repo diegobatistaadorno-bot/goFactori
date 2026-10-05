@@ -1,0 +1,22 @@
+{
+  "part_name": "Spacer Block",
+  "part_number": "PMP-1004",
+  "revision": "A",
+  "material_text": "Steel 1018 CRS",
+  "material_key": "steel_1018",
+  "process": "mill_3axis",
+  "shape": "prismatic",
+  "length_in": 2.0,
+  "width_in": 2.0,
+  "height_in": 1.0,
+  "feature_count": 3,
+  "setups": 2,
+  "material_removal_fraction": 0.2,
+  "tightest_tolerance_in": 0.001,
+  "finish_text": "Zinc plate clear per ASTM B633",
+  "finish_key": "zinc_plate",
+  "quantity": null,
+  "due_date_text": null,
+  "assumptions": [],
+  "confidence": "high"
+}

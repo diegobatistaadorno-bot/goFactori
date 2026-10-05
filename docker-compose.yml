@@ -1,0 +1,35 @@
+# Local stack: n8n (WhatsApp channel + orchestration) + quote-service (extraction, pricing, PDFs).
+#   cp .env.example .env   # fill in keys
+#   docker compose up -d --build
+services:
+  quote-service:
+    build:
+      context: .
+      dockerfile: quote-service/Dockerfile
+    env_file: .env
+    volumes:
+      - quote-data:/data
+      - ./quote-service/config:/srv/quote-service/config:ro   # edit shop.yaml without rebuilding
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  n8n:
+    image: n8nio/n8n:latest
+    environment:
+      - GENERIC_TIMEZONE=America/Puerto_Rico
+      - TZ=America/Puerto_Rico
+      - WEBHOOK_URL=${N8N_PUBLIC_URL}
+      - N8N_SECURE_COOKIE=false
+    volumes:
+      - n8n-data:/home/node/.n8n
+      - ./n8n/workflows:/workflows:ro
+    ports:
+      - "5678:5678"
+    depends_on:
+      - quote-service
+    restart: unless-stopped
+
+volumes:
+  quote-data:
+  n8n-data:

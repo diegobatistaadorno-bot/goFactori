@@ -1,0 +1,24 @@
+{
+  "part_name": "Drive Shaft",
+  "part_number": "PMP-1002",
+  "revision": "B",
+  "material_text": "4140 HT 28-32 HRC",
+  "material_key": "steel_4140",
+  "process": "turning",
+  "shape": "cylindrical",
+  "length_in": 6.0,
+  "width_in": 1.0,
+  "height_in": 1.0,
+  "feature_count": 5,
+  "setups": 2,
+  "material_removal_fraction": 0.3,
+  "tightest_tolerance_in": 0.0005,
+  "finish_text": "Black oxide per MIL-DTL-13924 Class 1",
+  "finish_key": "black_oxide",
+  "quantity": 50,
+  "due_date_text": null,
+  "assumptions": [
+    "Keyway milled as a secondary operation on the lathe part."
+  ],
+  "confidence": "high"
+}

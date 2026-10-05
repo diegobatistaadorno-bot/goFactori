@@ -1,0 +1,24 @@
+{
+  "part_name": "Pipe Flange 1-1/2 in",
+  "part_number": "PMP-1003",
+  "revision": "A",
+  "material_text": "SS 304",
+  "material_key": "stainless_304",
+  "process": "turning",
+  "shape": "cylindrical",
+  "length_in": 0.75,
+  "width_in": 4.0,
+  "height_in": 4.0,
+  "feature_count": 6,
+  "setups": 2,
+  "material_removal_fraction": 0.4,
+  "tightest_tolerance_in": 0.002,
+  "finish_text": "Passivate per ASTM A967",
+  "finish_key": "passivate",
+  "quantity": 25,
+  "due_date_text": null,
+  "assumptions": [
+    "Bolt holes drilled on lathe with live tooling or secondary op."
+  ],
+  "confidence": "high"
+}
