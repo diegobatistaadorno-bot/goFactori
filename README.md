@@ -50,10 +50,14 @@ Comparing Claude's output with `samples/drawings/*.json` is your first accuracy 
 
 ## 2. Run the stack in Docker
 
+Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) and start it. Then:
+
 ```bash
-cp .env.example .env        # fill ANTHROPIC_API_KEY, OWNER_WHATSAPP; Twilio values in step 3
-docker compose up -d --build
+./scripts/docker-setup.sh --offline   # demo mode, no API keys
+./scripts/docker-setup.sh             # real Claude extraction (set ANTHROPIC_API_KEY in .env first)
 ```
+
+The script checks Docker, creates `.env`, builds and starts both containers, and imports the n8n workflows. To do it by hand: `cp .env.example .env`, then `docker compose up -d --build`.
 
 - n8n runs at http://localhost:5678 (create the owner account on first visit).
 - The quote service runs at http://localhost:8000 (`/health`, `/quotes`, `/docs`).
