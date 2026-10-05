@@ -4,3 +4,4 @@ __pycache__/
 .pytest_cache/
 quote-service/data/
 quote-service/data-sim/
+n8n-cloud/test/out/
