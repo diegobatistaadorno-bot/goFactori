@@ -109,6 +109,12 @@ const downloadDrawing = node({
   output: [{}],
 });
 
+const setFileType = node({
+  type: 'n8n-nodes-base.code', version: 2,
+  config: { name: "Set file type", parameters: { mode: 'runOnceForAllItems', language: 'javaScript', jsCode: "// Node \"Set file type\": Claude needs the real file type (some servers send application/octet-stream).\nconst type = $('Decide what to do').first().json.media_type;\nreturn $input.all().map((item) => {\n  if (item.binary && item.binary.data && type) item.binary.data.mimeType = type;\n  return item;\n});\n" } },
+  output: [{}],
+});
+
 const pdfOrPhoto = ifElse({
   version: 2.3,
   config: { name: 'PDF or photo?', parameters: { conditions: { options: { caseSensitive: true, leftValue: '', typeValidation: 'loose', version: 2 },
@@ -340,7 +346,7 @@ export default workflow('wa-quote-agent', 'WhatsApp Quote Agent')
   .to(savesQuote.onTrue(saveQuote.to(listReplies)).onFalse(listReplies))
   .add(listReplies).to(sendReplies)
   .to(needsProcessing.onTrue(needsClaude
-    .onTrue(downloadDrawing.to(pdfOrPhoto.onTrue(readPdf.to(collectReading)).onFalse(readPhoto.to(collectReading))))
+    .onTrue(downloadDrawing.to(setFileType).to(pdfOrPhoto.onTrue(readPdf.to(collectReading)).onFalse(readPhoto.to(collectReading))))
     .onFalse(collectReading)))
   .add(collectReading).to(priceDraft).to(savePriced).to(listDraftReplies).to(sendDraft)
   .add(pdfLink).to(findQuote).to(collectPdf).to(renderPdf).to(pdfFound.onTrue(respondPdf).onFalse(respondNotFound))
@@ -348,7 +354,7 @@ export default workflow('wa-quote-agent', 'WhatsApp Quote Agent')
   .add(setupNote)
   .group('Reply instantly', [ackTwilio, loadQuotes, collectMessage, decideNode, savesQuote, saveQuote, listReplies, sendReplies], {
     description: 'Answers Twilio, decides what to say (Spanish), saves the quote and sends the instant WhatsApp reply.' })
-  .group('Read and price the drawing', [needsProcessing, needsClaude, downloadDrawing, pdfOrPhoto, readPdf, readPhoto, collectReading, priceDraft, savePriced, listDraftReplies, sendDraft], {
+  .group('Read and price the drawing', [needsProcessing, needsClaude, downloadDrawing, setFileType, pdfOrPhoto, readPdf, readPhoto, collectReading, priceDraft, savePriced, listDraftReplies, sendDraft], {
     description: 'Claude reads the drawing, the shop formula prices it, and the owner gets the draft with a PDF link.' })
   .group('Serve the quote PDF', [findQuote, collectPdf, renderPdf, pdfFound, respondPdf, respondNotFound], {
     description: 'Builds the English quote PDF on request. Twilio downloads it from this link to attach it on WhatsApp.' })

@@ -160,6 +160,8 @@ const downloadDrawing = node({
   output: [{}],
 });
 
+${codeNode('setFileType', 'Set file type', 'set_file_type.js', [{}])}
+
 const pdfOrPhoto = ifElse({
   version: 2.3,
   config: { name: 'PDF or photo?', parameters: { conditions: { options: { caseSensitive: true, leftValue: '', typeValidation: 'loose', version: 2 },
@@ -249,7 +251,7 @@ export default workflow('wa-quote-agent', 'WhatsApp Quote Agent')
   .to(savesQuote.onTrue(saveQuote.to(listReplies)).onFalse(listReplies))
   .add(listReplies).to(sendReplies)
   .to(needsProcessing.onTrue(needsClaude
-    .onTrue(downloadDrawing.to(pdfOrPhoto.onTrue(readPdf.to(collectReading)).onFalse(readPhoto.to(collectReading))))
+    .onTrue(downloadDrawing.to(setFileType).to(pdfOrPhoto.onTrue(readPdf.to(collectReading)).onFalse(readPhoto.to(collectReading))))
     .onFalse(collectReading)))
   .add(collectReading).to(priceDraft).to(savePriced).to(listDraftReplies).to(sendDraft)
   .add(pdfLink).to(findQuote).to(collectPdf).to(renderPdf).to(pdfFound.onTrue(respondPdf).onFalse(respondNotFound))
@@ -257,13 +259,25 @@ export default workflow('wa-quote-agent', 'WhatsApp Quote Agent')
   .add(setupNote)
   .group('Reply instantly', [ackTwilio, loadQuotes, collectMessage, decideNode, savesQuote, saveQuote, listReplies, sendReplies], {
     description: 'Answers Twilio, decides what to say (Spanish), saves the quote and sends the instant WhatsApp reply.' })
-  .group('Read and price the drawing', [needsProcessing, needsClaude, downloadDrawing, pdfOrPhoto, readPdf, readPhoto, collectReading, priceDraft, savePriced, listDraftReplies, sendDraft], {
+  .group('Read and price the drawing', [needsProcessing, needsClaude, downloadDrawing, setFileType, pdfOrPhoto, readPdf, readPhoto, collectReading, priceDraft, savePriced, listDraftReplies, sendDraft], {
     description: 'Claude reads the drawing, the shop formula prices it, and the owner gets the draft with a PDF link.' })
   .group('Serve the quote PDF', [findQuote, collectPdf, renderPdf, pdfFound, respondPdf, respondNotFound], {
     description: 'Builds the English quote PDF on request. Twilio downloads it from this link to attach it on WhatsApp.' })
   .group('Follow-ups', [loadSent, collectSent, dueFollowups, markFollowup, hasFollowup, sendFollowup], {
     description: 'One nudge about 20h after a quote is sent, only while the WhatsApp 24h window is still open.' });
 `;
+
+// Long code as concatenated string literals of whole lines (<= ~1500 chars each), so the SDK file stays readable.
+function chunked(src) {
+  const parts = [];
+  let cur = '';
+  for (const line of src.split('\n')) {
+    if (cur && cur.length + line.length > 1500) { parts.push(cur); cur = ''; }
+    cur += line + '\n';
+  }
+  if (cur) parts.push(cur);
+  return parts.map((x) => JSON.stringify(x)).join('\n      + ');
+}
 
 const logicSdk = `import { workflow, node, trigger, sticky } from '@n8n/workflow-sdk';
 
@@ -276,7 +290,7 @@ const calledBy = trigger({
 const quoteLogic = node({
   type: 'n8n-nodes-base.code', version: 2,
   config: { name: 'Quote logic', parameters: { mode: 'runOnceForAllItems', language: 'javaScript',
-    jsCode: ${process.env.STUB ? JSON.stringify("// replaced with dist/logic.js\nreturn $input.all();") : JSON.stringify(logicSource)} } },
+    jsCode: ${process.env.STUB ? JSON.stringify("// replaced with dist/logic.js\nreturn $input.all();") : chunked(logicSource)} } },
   output: [{ has_quote: true }],
 });
 

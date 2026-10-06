@@ -17,6 +17,8 @@ Customer (WhatsApp)                   n8n                       quote-service (P
 
 **How the work is split:** Claude only *reads* the drawing and fills a structured spec (material, envelope, features, tolerances, finish, quantity). The **price is plain code** driven by `quote-service/config/shop.yaml`, which the owner can edit. n8n handles the WhatsApp channel: receiving, sending, scheduling. The quote service decides what to say. So moving from Twilio to the Meta Cloud API later only means swapping the send/receive nodes in n8n.
 
+> **No-hosting version:** `n8n-cloud/` has the same agent built entirely inside n8n Cloud (Claude via the Anthropic node, a data table for quotes, the PDF served from an n8n webhook). It's the fastest path to a live demo. See [n8n-cloud/README.md](n8n-cloud/README.md).
+
 ## Repo layout
 
 | Path | What |
